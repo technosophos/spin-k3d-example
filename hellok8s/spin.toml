@@ -1,0 +1,18 @@
+spin_manifest_version = 2
+
+[application]
+name = "hellok8s"
+version = "0.1.0"
+authors = ["Matt Butcher <matt.butcher@fermyon.com>"]
+description = "Simple hello world to test with k8s"
+
+[[trigger.http]]
+route = "/..."
+component = "hellok8s"
+
+[component.hellok8s]
+source = "target/wasm32-wasi/release/hellok8s.wasm"
+allowed_outbound_hosts = []
+[component.hellok8s.build]
+command = "cargo build --target wasm32-wasi --release"
+watch = ["src/**/*.rs", "Cargo.toml"]

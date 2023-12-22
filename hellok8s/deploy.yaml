@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hellok8s
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: hellok8s
+  template:
+    metadata:
+      labels:
+        app: hellok8s
+    spec:
+      runtimeClassName: wasmtime-spin
+      containers:
+        - name: hellok8s
+          image: default/hellok8s:0.1.0
+          command: ["/"]
+          imagePullPolicy: IfNotPresent
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hellok8s
+spec:
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  selector:
+    app: hellok8s
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: hellok8s
+  annotations:
+    ingress.kubernetes.io/ssl-redirect: "false"
+    kubernetes.io/ingress.class: traefik
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /hellok8s
+            pathType: Prefix
+            backend:
+              service:
+                name: hellok8s
+                port:
+                  number: 80
